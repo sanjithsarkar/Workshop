@@ -17,13 +17,13 @@
                     </x-nav-link>
 
                     <x-nav-link :href="route('users.index')">
-                        {{ __('Users') }}
+                        {{ __('Manage User') }}
                     </x-nav-link>
                     <x-nav-link :href="route('roles.index')">
-                        {{ __('Roles') }}
+                        {{ __('Manage Role') }}
                     </x-nav-link>
                     <x-nav-link :href="route('permissions.index')">
-                        {{ __('Permissions') }}
+                        {{ __('Manage Permission') }}
                     </x-nav-link>
                 </div>
             </div>
