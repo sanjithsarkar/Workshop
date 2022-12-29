@@ -48,16 +48,24 @@
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
+                        @canany('user-access','user-create','user-edit','user-delete')
                         <li class="nav-item active">
                             <a class="nav-link" href="{{ route('users.index') }}">Manage User <span
                                     class="sr-only">(current)</span></a>
                         </li>
+                        @endcanany
+
+                        @canany('role-access','role-create','role-edit','role-delete')
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('roles.index') }}">Manage Role</a>
                         </li>
+                        @endcanany
+
+                        @canany('permission-access','permission-edit','permission-create','permission-delete')
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('permissions.index') }}">Manage Permission</a>
                         </li>
+                        @endcanany
                     </ul>
                     <div class="d-flex justify-content-end">
                         @php

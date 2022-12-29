@@ -37,13 +37,11 @@
                                     @endforeach
 
                                     <td width="30%">
-                                        @can('user-edit')
                                             <a href="{{ route('users.show', $user->id) }}" class="btn btn-outline-success btn-sm mr-2">
                                                 <i class="fa fa-eye" aria-hidden="true">
                                                     Show
                                                 </i>
                                             </a>
-                                        @endcan
 
                                         @can('user-edit')
                                             <a href="{{ route('users.edit', $user->id) }}"

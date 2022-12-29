@@ -12,19 +12,28 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    @canany('user-access','user-create','user-edit','user-delete')
                     <x-nav-link :href="route('users.index')">
                         {{ __('Manage User') }}
                     </x-nav-link>
+                    @endcanany
+
+                    @canany('role-access','role-create','role-edit','role-delete')
                     <x-nav-link :href="route('roles.index')">
                         {{ __('Manage Role') }}
                     </x-nav-link>
+                    @endcanany
+
+                    @canany('permission-access','permission-edit','permission-create','permission-delete')
                     <x-nav-link :href="route('permissions.index')">
                         {{ __('Manage Permission') }}
                     </x-nav-link>
+                    @endcanany
                 </div>
             </div>
 

@@ -31,13 +31,11 @@
                                     <td width="20% " scope="row">{{ ++$i }}</td>
                                     <td width="20%">{{ $permission->name }}</td>
                             <td width="30%">
-                                @can('permission-edit')
                                     <a href="#" class="btn btn-outline-success btn-sm mr-2">
                                         <i class="fa fa-eye" aria-hidden="true">
                                             Show
                                         </i>
                                     </a>
-                                @endcan
 
                                 @can('permission-edit')
                                     <a href="{{ route('permissions.edit', $permission->id) }}" class="btn btn-outline-primary btn-sm mr-2">

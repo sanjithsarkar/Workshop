@@ -39,13 +39,11 @@
                                     </td>
 
                                     <td width="30%">
-                                        @can('role-edit')
                                             <a href="#" class="btn btn-outline-success btn-sm mr-2">
                                                 <i class="fa fa-eye" aria-hidden="true">
                                                     Show
                                                 </i>
                                             </a>
-                                        @endcan
 
                                         @can('role-edit')
                                             <a href="{{ route('roles.edit', $role->id) }}"
