@@ -1,8 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PermissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,28 +21,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified'
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return redirect(route('view.user'));
-    })->name('dashboard');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+require __DIR__.'/auth.php';
+
+Route::group(['middleware' => ['auth']], function() {
+    Route::resource('roles', RoleController::class);
+    Route::resource('users', UserController::class);
+    Route::resource('products', ProductController::class);
+    Route::resource('permissions',PermissionController::class);
 });
 
-// UserController
-
-Route::get('/userlist', [UserController::class, 'ViewUserlist'])->name('view.user');
-Route::get('/create/user', [UserController::class, 'CreateUser'])->name('create.user');
-Route::post('/insert/user', [UserController::class, 'InsertUser'])->name('insert.user');
-Route::get('/show/user/{id}', [UserController::class, 'ShowUser'])->name('show.user');
-Route::get('/edit/user/{id}', [UserController::class, 'EditUser'])->name('edit.user');
-Route::post('/update/user/{id}', [UserController::class, 'UpdateUser'])->name('update.user');
-Route::get('/delete/user/{id}', [UserController::class, 'UserDelete'])->name('delete.user');
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
-
-
-//  Product Controller
-
-Route::resource('/products', ProductController::class);

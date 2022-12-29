@@ -49,11 +49,14 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item active">
-                            <a class="nav-link" href="{{ route('view.user') }}">Userlist <span
+                            <a class="nav-link" href="{{ route('users.index') }}">Manage Users <span
                                     class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('products.index') }}">Product</a>
+                            <a class="nav-link" href="{{ route('roles.index') }}">Manage Roles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('permissions.index') }}">Manage Permission</a>
                         </li>
                     </ul>
                     <div class="d-flex justify-content-end">

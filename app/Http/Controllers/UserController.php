@@ -2,168 +2,118 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use DB;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-
-    // Display a listing of the User
-
-    public function ViewUserlist()
+    function __construct()
     {
-        $users = User::with('role')->get();
-        //dd($users->toArray());
-        return view('user.userlist')->with('users', $users);
+        $this->middleware('role_or_permission:user-access|user-create|user-edit|user-delete', ['only' => ['index', 'show']]);
+        $this->middleware('role_or_permission:user-create', ['only' => ['create', 'store']]);
+        $this->middleware('role_or_permission:user-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('role_or_permission:user-delete', ['only' => ['destroy']]);
     }
 
-
-    // Show the form for creating a new user
-
-    public function CreateUser()
+    public function index(Request $request)
     {
-        return view('user.create');
+        $users = User::latest()->get();
+        return view('users.index')->with('users', $users);
     }
 
-
-    //Store a newly created user in storage
-
-    public function InsertUser(Request $request)
+    public function create()
     {
-        $validateData = $request->validate([
+        $roles = Role::get();
+        return view('users.create')->with('roles', $roles);
+    }
+
+    public function store(Request $request)
+    {
+        $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|unique:users|max:255',
-            'password' => 'required',
-            'usertype' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|same:confirm-password',
+            'roles' => 'required'
         ]);
 
+        $input = $request->all();
+        $input['password'] = Hash::make($input['password']);
 
-        $role = array();
-        $role['view_role'] = $request->view_role;
-        $role['create_role'] = $request->create_role;
-        $role['edit_role'] = $request->edit_role;
-        $role['delete_role'] = $request->delete_role;
-        $role['view_product'] = $request->view_product;
-        $role['create_product'] = $request->create_product;
-        $role['edit_product'] = $request->edit_product;
-        $role['delete_product'] = $request->delete_product;
-        $role_id = DB::table('roles')->insertGetId($role);
+        $user = User::create($input);
+        $user->assignRole($request->input('roles'));
 
-        $data = new User();
-        $data->role_id = $role_id;
-        $data->name = $request->name;
-        $data->email = $request->email;
-        $data->usertype = $request->usertype;
-        $data->password = Hash::make($request->password);
-        $data->save();
-
-
-        $notification = array(
-            'message' => 'User Inserted Successfully',
-            'alert-type' => 'success'
-        );
-
-        return redirect(route('view.user'))->with($notification);
-    }
-
-    // Display the specified user
-
-    public function ShowUser($id)
-    {
-        $user = User::where('id', $id)->first();
-        return view('user.show_user')->with('user', $user);
+        return redirect()->route('users.index')
+            ->with('success', 'User created successfully');
     }
 
 
-    // Edit User
-
-    public function EditUser($id)
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show(User $user)
     {
-        $user = User::find($id);
-        return view('user.edit_user')->with('user', $user);
+        return view('users.show')->with('user', $user);
     }
 
-    // End Edit User
-
-
-    // Update User
-
-    public function UpdateUser(Request $request, $id)
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(User $user)
     {
-        $usertype = User::where('usertype', $request->usertype)->first();
-        if ($usertype != '') {
+        $role = Role::get();
+        $user->roles;
+        return view('users.edit', ['user' => $user, 'roles' => $role]);
+    }
 
-            $data = User::where('id', $id)->first();
-            $data->usertype = $request->usertype;
-            $data->save();
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $user->id . ',id',
+        ]);
 
-            $role = Role::where('id', $data->role_id)->first();
-            $role->view_role = $request->view_role;
-            $role->create_role = $request->create_role;
-            $role->edit_role = $request->edit_role;
-            $role->delete_role = $request->delete_role;
-            $role->view_product = $request->view_product;
-            $role->create_product = $request->create_product;
-            $role->edit_product = $request->edit_product;
-            $role->delete_product = $request->delete_product;
-            //dd($role);
-            $role->save();
-
-            $notification = array(
-                'message' => 'User Updated Successfully',
-                'alert-type' => 'success'
-            );
-
-            return redirect(route('view.user'))->with($notification);
-        } else {
-
-            $data = User::where('id', $id)->first();
-            //$data->usertype = $request->usertype;
-            //$data->save();
-
-            $role = Role::where('id', $data->role_id)->first();
-            $role->view_role = $request->view_role;
-            $role->create_role = $request->create_role;
-            $role->edit_role = $request->edit_role;
-            $role->delete_role = $request->delete_role;
-            $role->view_product = $request->view_product;
-            $role->create_product = $request->create_product;
-            $role->edit_product = $request->edit_product;
-            $role->delete_product = $request->delete_product;
-            //dd($role);
-            $role->save();
-
-            $notification = array(
-                'message' => 'User Updated Successfully',
-                'alert-type' => 'success'
-            );
-
-            return redirect(route('view.user'))->with($notification);
+        if ($request->password != null) {
+            $request->validate([
+                'password' => 'required|confirmed'
+            ]);
+            $validated['password'] = bcrypt($request->password);
         }
+
+        $user->update($validated);
+
+        $user->syncRoles($request->roles);
+        return redirect()->back()->withSuccess('User updated !!!');
     }
 
-
-    // User Delete
-
-    public function UserDelete($id)
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(User $user)
     {
-        $user = User::where('id', $id)->first();
         $user->delete();
-
-        $notification = array(
-            'message' => 'User Deleted Successfully',
-            'alert-type' => 'success'
-        );
-
-        return redirect(route('view.user'))->with($notification);
+        return redirect(route('users.index'))->withSuccess('Role deleted !!!');
     }
 
-
-    // User Logout Method
 
     public function logout(Request $request)
     {
@@ -180,6 +130,4 @@ class UserController extends Controller
 
         return redirect('/login')->with($notification);
     }
-
-    // End User Logout Method
 }
